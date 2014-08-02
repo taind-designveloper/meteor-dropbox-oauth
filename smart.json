@@ -1,0 +1,8 @@
+{
+  "name": "dropbox-oauth",
+  "description": "Dropbox Oauth connect flow",
+  "homepage": "https://github.com/mathieudutour/meteor-dropbox-oauth",
+  "author": "Mathieu Dutour <mathieu@dutour.me>",
+  "version": "0.0.1",
+  "git": "https://github.com/mathieudutour/meteor-dropbox-oauth.git"
+}
