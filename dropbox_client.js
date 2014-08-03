@@ -22,7 +22,7 @@ DropboxOauth.requestCredential = function (options, callback) {
 
   var loginUrl =
       'https://www.dropbox.com/1/oauth2/authorize?' +
-      '?client_id=' + config.appId + '&response_type=code' + '&state=' + state +
+      'client_id=' + config.clientId + '&response_type=code' + '&state=' + state +
       '&redirect_uri=' + encodeURIComponent(Meteor.absoluteUrl('_oauth/dropbox?close'));
 
   OAuth.initiateLogin(state, loginUrl, callback, {width: 875, height: 400});
