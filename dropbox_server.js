@@ -47,7 +47,7 @@ var getTokenResponse = function (query) {
     // Request an access token
     responseContent = Meteor.http.post(
       "https://api.dropbox.com/1/oauth2/token", {
-        auth: [config.appId, config.secret].join(':'),
+        auth: [config.clientId, config.secret].join(':'),
         params: {
           grant_type: 'authorization_code',
           code: query.code,
@@ -82,7 +82,7 @@ var getTokenResponse = function (query) {
 var getIdentity = function (accessToken) {
   try {
     return Meteor.http.get("https://api.dropbox.com/1/account/info", {
-        headers: { "Authorization": 'bearer ' + accessToken }
+        headers: { Authorization: 'Bearer ' + accessToken }
     }).data;
   } catch (err) {
     throw new Error("Failed to fetch identity from dropbox. " + err.message);
