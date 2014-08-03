@@ -1,7 +1,5 @@
 DropboxOauth = {};
 
-//var urlUtil = Npm.require('url');
-
 OAuth.registerService('dropbox', 2, null, function(query) {
 
   var response = getTokenResponse(query);

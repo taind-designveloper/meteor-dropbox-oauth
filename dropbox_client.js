@@ -20,16 +20,10 @@ DropboxOauth.requestCredential = function (options, callback) {
 
   var state = Random.id();
 
-  var scope = [];
-  if (options && options.requestPermissions) {
-      scope = options.requestPermissions.join(',');
-  }
-
   var loginUrl =
       'https://www.dropbox.com/1/oauth2/authorize?' +
       '?client_id=' + config.appId + '&response_type=code' + '&state=' + state +
-      '&redirect_uri=' + encodeURIComponent(Meteor.absoluteUrl('_oauth/dropbox?close')) +
-      '&duration=permanent' + '&scope=' + scope;
+      '&redirect_uri=' + encodeURIComponent(Meteor.absoluteUrl('_oauth/dropbox?close'));
 
   OAuth.initiateLogin(state, loginUrl, callback, {width: 875, height: 400});
 };
