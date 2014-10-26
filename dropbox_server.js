@@ -1,82 +1,60 @@
 DropboxOauth = {};
 
 OAuth.registerService('dropbox', 2, null, function(query) {
+    var response = getTokens(query);
+    var accessToken = response.accessToken;
+    var identity = getIdentity(accessToken);
 
-  var response = getTokenResponse(query);
-  var accessToken = response.accessToken;
-  var identity = getIdentity(accessToken);
+    var serviceData = {
+        id: identity.uid,
+        accessToken: accessToken,
+        expiresAt: (+new Date()) + (1000 * response.expiresIn)
+    };
 
-  var serviceData = {
-    id: identity.uid,
-    accessToken: accessToken,
-    expiresAt: (+new Date()) + (1000 * response.expiresIn)
-  };
+    // include all fields from dropbox
+    // https://www.dropbox.com/developers/core/docs#account-info
+    var fields = _.pick(identity, ['display_name', 'country']);
+    _.extend(serviceData, fields);
 
-  // include all fields from dropbox
-  // https://www.dropbox.com/developers/core/docs#account-info
-  var fields = _.pick(identity, ['display_name', 'country']);
-
-  return {
-    serviceData: serviceData,
-    options: {
-      profile: fields
-    }
-  };
+    return {
+        serviceData: serviceData,
+        options: {
+            profile: { name: identity.display_name }
+        }
+    };
 });
-
-// checks whether a string parses as JSON
-var isJSON = function (str) {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
 
 // returns an object containing:
 // - accessToken
 // - expiresIn: lifetime of token in seconds
-var getTokenResponse = function (query) {
+var getTokens = function (query) {
   var config = ServiceConfiguration.configurations.findOne({service: 'dropbox'});
   if (!config)
-    throw new ServiceConfiguration.ConfigError("Service not configured");
+    throw new ServiceConfiguration.ConfigError();
 
-  var responseContent;
+  var response;
   try {
-    // Request an access token
-    responseContent = Meteor.http.post(
-      "https://api.dropbox.com/1/oauth2/token", {
-        auth: [config.clientId, config.secret].join(':'),
-        params: {
-          grant_type: 'authorization_code',
-          code: query.code,
-          redirect_uri: Meteor.absoluteUrl("_oauth/dropbox?close")
-        }
-      }).content;
+    response = HTTP.post(
+      "https://api.dropbox.com/1/oauth2/token", {params: {
+        code: query.code,
+        client_id: config.clientId,
+        client_secret: OAuth.openSecret(config.secret),
+        redirect_uri: OAuth._redirectUri('dropbox', config, {}, {secure: true}),
+        grant_type: 'authorization_code'
+      }});
   } catch (err) {
-    throw new Error("Failed to complete OAuth handshake with dropbox. " + err.message);
+    throw _.extend(new Error("Failed to complete OAuth handshake with Dropbox. " + err.message),
+                   {response: err.response});
   }
 
-  // If 'responseContent' does not parse as JSON, it is an error.
-  if (!isJSON(responseContent)) {
-    throw new Error("Failed to complete OAuth handshake with dropbox. " + responseContent);
+  if (response.data.error) { // if the http response was a json object with an error attribute
+    throw new Error("Failed to complete OAuth handshake with Dropbox. " + response.data.error);
+  } else {
+    return {
+      accessToken: response.data.access_token,
+      expiresIn: response.data.expires_in
+    };
   }
-
-  // Success! Extract access token and expiration
-  var parsedResponse = JSON.parse(responseContent);
-  var accessToken = parsedResponse.access_token;
-  var expiresIn = parsedResponse.expires_in;
-
-  if (!accessToken) {
-    throw new Error("Failed to complete OAuth handshake with dropbox " +
-      "-- can't find access token in HTTP response. " + responseContent);
-  }
-
-  return {
-    accessToken: accessToken,
-    expiresIn: expiresIn
-  };
 };
 
 var getIdentity = function (accessToken) {
