@@ -1,11 +1,11 @@
-DropboxOauth = {};
+DropboxOAuth = {};
 
 // Request dropbox credentials for the user
 // @param options {optional}
 // @param callback {Function} Callback function to call on
 //   completion. Takes one argument, credentialToken on success, or Error on
 //   error.
-DropboxOauth.requestCredential = function (options, callback) {
+DropboxOAuth.requestCredential = function (options, callback) {
   // support both (options, callback) and (callback).
   if (!callback && typeof options === 'function') {
     callback = options;

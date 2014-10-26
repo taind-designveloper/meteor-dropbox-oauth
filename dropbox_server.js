@@ -1,4 +1,4 @@
-DropboxOauth = {};
+DropboxOAuth = {};
 
 OAuth.registerService('dropbox', 2, null, function(query) {
     var response = getTokens(query);
@@ -67,6 +67,6 @@ var getIdentity = function (accessToken) {
   }
 };
 
-DropboxOauth.retrieveCredential = function(credentialToken, credentialSecret) {
+DropboxOAuth.retrieveCredential = function(credentialToken, credentialSecret) {
   return OAuth.retrieveCredential(credentialToken, credentialSecret);
 };
