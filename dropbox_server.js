@@ -34,7 +34,7 @@ var getTokens = function (query) {
 
   var response;
   try {
-    var redirectUri = OAuth._redirectUri('dropbox', config, {}, {secure: true}).replace('?close&', '?close=true&');
+    var redirectUri = OAuth._redirectUri('dropbox', config, {}, {secure: true}).replace('?close', '?close=true');
     console.log(redirectUri);
     response = HTTP.post(
       "https://api.dropbox.com/1/oauth2/token", {params: {
