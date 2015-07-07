@@ -34,12 +34,14 @@ var getTokens = function (query) {
 
   var response;
   try {
+    var redirectUri = OAuth._redirectUri('dropbox', config, {}, {secure: true}).replace('?close&', '?close=true&');
+    console.log(redirectUri);
     response = HTTP.post(
       "https://api.dropbox.com/1/oauth2/token", {params: {
         code: query.code,
         client_id: config.clientId,
         client_secret: OAuth.openSecret(config.secret),
-        redirect_uri: OAuth._redirectUri('dropbox', config, {}, {secure: true}),
+        redirect_uri: redirectUri,
         grant_type: 'authorization_code'
       }});
   } catch (err) {
