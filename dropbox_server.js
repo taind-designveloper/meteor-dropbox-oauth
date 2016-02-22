@@ -8,7 +8,7 @@ OAuth.registerService('dropbox', 2, null, function(query) {
     var serviceData = {
         id: identity.uid,
         accessToken: accessToken,
-        expiresAt: (+new Date()) + (1000 * response.expiresIn)
+        expiresAt: Date.now() + (1000 * response.expiresIn)
     };
 
     // include all fields from dropbox
